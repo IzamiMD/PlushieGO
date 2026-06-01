@@ -428,7 +428,7 @@ font-family: 'Nunito', sans-serif;
 
     <!-- Hint -->
     <div class="hint-bar" id="hint-bar" style="display:none">
-      <span>💡</span><span id="hint-text">Tap on the canvas to place your plushie</span>
+      <span></span><span id="hint-text">Tap on the canvas to place your plushie</span>
     </div>
 
     <!-- Placement tools -->
@@ -650,16 +650,16 @@ function resetBGRemoval() {
 }
 
 function acceptBGRemoval() {
-  showToast('✅ Background removed');
+  showToast(' Background removed');
 }
 
 function savePlushie() {
   const name = document.getElementById('plushie-name').value.trim();
   const height = parseFloat(document.getElementById('plushie-height').value);
   const width = parseFloat(document.getElementById('plushie-width').value) || null;
-  if (!state.regProcessedDataURL) { showToast('⚠️ Upload a photo first'); return; }
-  if (!name) { showToast('⚠️ Enter a name'); return; }
-  if (!height || isNaN(height)) { showToast('⚠️ Enter height'); return; }
+  if (!state.regProcessedDataURL) { showToast(' Upload a photo first'); return; }
+  if (!name) { showToast(' Enter a name'); return; }
+  if (!height || isNaN(height)) { showToast(' Enter height'); return; }
   const entry = {
     id: Date.now().toString(),
     name, height, width,
@@ -667,7 +667,7 @@ function savePlushie() {
     createdAt: new Date().toISOString()
   };
   DB.add(entry);
-  showToast('🧸 ' + name + ' saved!');
+  showToast(' ' + name + ' saved!');
   // Reset form
   document.getElementById('plushie-name').value = '';
   document.getElementById('plushie-height').value = '';
@@ -699,7 +699,7 @@ function refreshCamPlushieGrid() {
   const grid = document.getElementById('cam-plushie-grid');
   const list = DB.getAll();
   if (!list.length) {
-    grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">😔</div><p>Register a plushie first!</p></div>';
+    grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon"></div><p>Register a plushie first!</p></div>';
     return;
   }
   grid.innerHTML = list.map(p => `
@@ -1036,7 +1036,7 @@ function updateHint() {
 //  Export
 // ============================================================
 function exportImage(format) {
-  if (!state.placed) { showToast('⚠️ Place a plushie first'); return; }
+  if (!state.placed) { showToast(' Place a plushie first'); return; }
   redraw();
   const mime = format === 'png' ? 'image/png' : 'image/jpeg';
   const quality = format === 'jpeg' ? 0.92 : undefined;
