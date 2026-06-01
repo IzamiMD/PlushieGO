@@ -372,7 +372,7 @@ font-family: 'Nunito', sans-serif;
 
     <!-- Mode selection -->
     <div class="card">
-      <div class="card-title">🎮 Mode</div>
+      <div class="card-title"> Mode</div>
       <div class="mode-grid">
         <div class="mode-card active" id="mode-closeup" onclick="selectMode('closeup')">
                     <div class="mode-icon">
@@ -404,7 +404,7 @@ font-family: 'Nunito', sans-serif;
 
     <!-- Photo upload -->
     <div class="card">
-      <div class="card-title">🖼 Background Photo</div>
+      <div class="card-title"> Background Photo</div>
       <div class="upload-zone" id="cam-upload-zone">
         <input type="file" accept="image/*" id="cam-file-input"/>
         <div id="cam-upload-placeholder">
@@ -504,7 +504,7 @@ font-family: 'Nunito', sans-serif;
 
 </div><!-- /#app -->
 
-<div id="toast">🎉 Saved!</div>
+<div id="toast"> Saved!</div>
 
 <script>
 // ============================================================
@@ -1062,7 +1062,7 @@ function exportImage(format) {
   a.href = data;
   a.download = `plushiego-${Date.now()}.${format}`;
   a.click();
-  showToast('📥 Downloaded as ' + format.toUpperCase());
+  showToast(' Downloaded as ' + format.toUpperCase());
 }
 
 // ============================================================
@@ -1073,7 +1073,7 @@ function refreshLibrary() {
   const list = DB.getAll();
   document.getElementById('lib-count').innerHTML = `<span class="dot"></span>${list.length} saved`;
   if (!list.length) {
-    grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">🧸</div><p>No plushies yet</p></div>';
+    grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon"></div><p>No plushies yet</p></div>';
     return;
   }
   grid.innerHTML = list.map(p => `
