@@ -450,6 +450,12 @@ font-family: 'Nunito', sans-serif;
   </div>
   <input type="range" id="blur-slider" min="0" max="10" value="0" oninput="onBlurSlider()"/>
 </div>
+        <div class="slider-group">
+  <div class="slider-label">
+    <span>Plushie Blur</span><span class="val" id="plushie-blur-val">0px</span>
+  </div>
+  <input type="range" id="plushie-blur-slider" min="0" max="5" step="0.5" value="0" oninput="onPlushieBlurSlider()"/>
+</div>
 
         <div class="slider-group">
           <div class="slider-label">
@@ -542,6 +548,7 @@ const state = {
   drag: { active: false, startX: 0, startY: 0, origX: 0, origY: 0 },
 shadowOpacity: 0.20,
   blurIntensity: 0, 
+  plushieBlur: 0,
   brightness: 100,
   placed: false
 };
@@ -647,6 +654,13 @@ function resetBGRemoval() {
   state.regProcessedDataURL = state.regRawDataURL;
   if (!rawImageData) return;
   bgCtx.putImageData(rawImageData, 0, 0);
+}
+
+  function onPlushieBlurSlider() {
+  const v = parseFloat(document.getElementById('plushie-blur-slider').value);
+  state.plushieBlur = v;
+  document.getElementById('plushie-blur-val').textContent = v + 'px';
+  redraw();
 }
 
 function acceptBGRemoval() {
@@ -834,9 +848,10 @@ function drawPlushie(ctx, p) {
   ctx.save();
   ctx.translate(p.x, p.y);
   ctx.rotate(p.rotate * Math.PI / 180);
-
-  ctx.filter = `brightness(${state.brightness}%)`;
-
+  
+  // Combine brightness and the new blur filter
+  ctx.filter = `brightness(${state.brightness}%) blur(${state.plushieBlur}px)`; 
+  
   ctx.drawImage(p.image, -dw/2, -dh/2, dw, dh);
   ctx.restore();
 }
@@ -1001,6 +1016,9 @@ function resetPlacement() {
   rdocument.getElementById('bright-slider').value = 100;
   document.getElementById('bright-val').textContent = '100%';
   state.brightness = 100;
+document.getElementById('plushie-blur-slider').value = 0;
+  document.getElementById('plushie-blur-val').textContent = '0px';
+  state.plushieBlur = 0;
   redraw();
 
 }
