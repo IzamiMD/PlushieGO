@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#ff6eb4">
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>PlushieGO </title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;900&family=Space+Mono:wght@400;700&display=swap');
+
+  :root {
+    --bg: #779e52;
+    --surface: #96507b;
+    --card: #221e33;
+    --border: #e4c663;
+    --accent: #ff6eb4;
+    --accent2: #a78bfa;
+    --accent3: #34d399;
+    --text: #f0ecff;
+    --muted: #ffffff;
+    --shadow-color: rgba(255,110,180,0.2);
+    --radius: 4px;
+    --radius-sm: 2px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+font-family: 'Nunito', sans-serif;
+  /* Add these lines to set a background image */
+  background-image: url('background.jpg');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  color: var(--text);
+  min-height: 100vh;
+  }
+
+  /* --- BACKGROUND --- */
+  body::before {
+    content: '';
+    position: fixed; inset: 0; z-index: 0;
+    background: radial-gradient(ellipse 80% 60% at 20% -10%, #2d1b4e 0%, transparent 60%),
+                radial-gradient(ellipse 60% 50% at 80% 110%, #1a0d30 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  /* --- LAYOUT --- */
+  #app { position: relative; z-index: 1; max-width: 520px; margin: 0 auto; padding: 16px; }
+
+  /* --- HEADER --- */
+  header {
+    display: flex; align-items: center; gap: 10px;
+    padding: 20px 0 16px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 20px;
+  }
+  header .logo { font-size: 28px; }
+  header h1 {
+    font-family: 'Space Mono', monospace;
+    font-size: 20px; font-weight: 700;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  header p { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  /* --- TABS --- */
+  .tabs {
+    display: grid; grid-template-columns: 1fr 1fr 1fr;
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 4px; gap: 4px; margin-bottom: 20px;
+    border: 1px solid var(--border);
+  }
+  .tab-btn {
+    padding: 10px 6px; border: none; background: transparent;
+    color: var(--muted); font-family: 'Nunito', sans-serif;
+    font-weight: 700; font-size: 13px; border-radius: 12px;
+    cursor: pointer; transition: all .2s; display: flex;
+    flex-direction: column; align-items: center; gap: 3px;
+  }
+  .tab-btn .tab-icon { font-size: 18px; }
+  .tab-btn.active {
+    background: var(--card); color: var(--text);
+    box-shadow: 0 2px 12px var(--shadow-color);
+  }
+
+  /* --- PANELS --- */
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* --- CARDS --- */
+  .card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 20px; margin-bottom: 16px;
+  }
+  .card-title {
+    font-size: 13px; font-weight: 700; color: var(--accent2);
+    text-transform: uppercase; letter-spacing: .08em; margin-bottom: 14px;
+    display: flex; align-items: center; gap: 6px;
+  }
+
+  /* --- INPUTS --- */
+  label { font-size: 13px; font-weight: 600; color: var(--muted); display: block; margin-bottom: 6px; }
+  input[type=text], input[type=number] {
+    width: 100%; padding: 11px 14px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    color: var(--text); font-family: 'Nunito', sans-serif; font-size: 14px;
+    outline: none; transition: border-color .2s;
+  }
+  input:focus { border-color: var(--accent2); }
+  .field { margin-bottom: 14px; }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  /* --- UPLOAD ZONE --- */
+  .upload-zone {
+    border: 2px dashed var(--border); border-radius: var(--radius);
+    padding: 32px 20px; text-align: center; cursor: pointer;
+    transition: all .2s; position: relative; overflow: hidden;
+    background: var(--surface);
+  }
+  .upload-zone:hover { border-color: var(--accent2); background: #1e1a2e; }
+  .upload-zone.has-image { border-style: solid; border-color: var(--accent2); padding: 0; }
+  .upload-zone img { width: 100%; border-radius: calc(var(--radius) - 2px); display: block; max-height: 220px; object-fit: contain; background: #141020; }
+  .upload-zone input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+  .upload-icon { font-size: 32px; margin-bottom: 8px; }
+  .upload-zone p { font-size: 13px; color: var(--muted); }
+  .upload-zone small { font-size: 11px; color: var(--muted); margin-top: 4px; display: block; }
+
+  /* --- BG REMOVAL --- */
+  #bg-removal-section { margin-top: 12px; }
+  .threshold-row { display: flex; align-items: center; gap: 12px; margin-top: 8px; }
+  .threshold-row input[type=range] { flex: 1; accent-color: var(--accent2); }
+  .threshold-row span { font-size: 12px; color: var(--muted); min-width: 28px; text-align: right; font-family: 'Space Mono', monospace; }
+  #bg-preview-wrap { margin-top: 10px; border-radius: var(--radius-sm); overflow: hidden; background: repeating-conic-gradient(#1a1628 0% 25%, #221e33 0% 50%) 0 0 / 16px 16px; }
+  #bg-preview { width: 100%; display: block; max-height: 180px; object-fit: contain; }
+
+  /* --- BUTTONS --- */
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 12px 20px; border: none; border-radius: var(--radius-sm);
+    font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 14px;
+    cursor: pointer; transition: all .2s; text-decoration: none;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent), #e040fb);
+    color: #fff; width: 100%; justify-content: center;
+    box-shadow: 0 4px 16px rgba(255,110,180,.3);
+  }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(255,110,180,.4); }
+  .btn-primary:active { transform: translateY(0); }
+  .btn-secondary {
+    background: var(--surface); color: var(--text);
+    border: 1px solid var(--border); justify-content: center;
+  }
+  .btn-secondary:hover { border-color: var(--accent2); color: var(--accent2); }
+  .btn-sm { padding: 8px 14px; font-size: 12px; }
+  .btn-danger { background: #3d1a1a; color: #ff6b6b; border: 1px solid #5a2a2a; }
+  .btn-danger:hover { background: #4d2020; }
+  .btn-success { background: #0f2e22; color: var(--accent3); border: 1px solid #1e4d3a; }
+  .btn-success:hover { background: #163d2d; }
+
+  /* --- PLUSHIE DB --- */
+  .plushie-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+  .plushie-card {
+    background: var(--surface); border: 2px solid var(--border);
+    border-radius: var(--radius-sm); overflow: hidden; cursor: pointer;
+    transition: all .2s; position: relative;
+  }
+  .plushie-card:hover { border-color: var(--accent2); transform: translateY(-2px); }
+  .plushie-card.selected { border-color: var(--accent); box-shadow: 0 0 0 3px var(--shadow-color); }
+  .plushie-card img { width: 100%; height: 100px; object-fit: contain; background: repeating-conic-gradient(#141020 0% 25%, #1a1628 0% 50%) 0 0 / 12px 12px; }
+  .plushie-card-info { padding: 8px 10px; }
+  .plushie-card-name { font-size: 13px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .plushie-card-meta { font-size: 11px; color: var(--muted); margin-top: 2px; font-family: 'Space Mono', monospace; }
+  .plushie-card .del-btn {
+    position: absolute; top: 5px; right: 5px;
+    background: rgba(0,0,0,.6); border: none; color: #ff6b6b;
+    border-radius: 50%; width: 22px; height: 22px; font-size: 12px;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    opacity: 0; transition: opacity .2s;
+  }
+  .plushie-card:hover .del-btn { opacity: 1; }
+  .empty-state { text-align: center; padding: 32px 20px; color: var(--muted); }
+  .empty-state .empty-icon { font-size: 40px; margin-bottom: 10px; }
+  .empty-state p { font-size: 13px; }
+
+  /* --- MODE PICKER --- */
+  .mode-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+  .mode-card {
+    background: var(--surface); border: 2px solid var(--border);
+    border-radius: var(--radius); padding: 18px 14px; cursor: pointer;
+    transition: all .2s; text-align: center;
+  }
+  .mode-card:hover { border-color: var(--accent2); }
+  .mode-card.active { border-color: var(--accent); background: #1e1030; }
+  .mode-card .mode-icon { font-size: 30px; margin-bottom: 8px; }
+  .mode-card .mode-name { font-weight: 700; font-size: 14px; }
+  .mode-card .mode-desc { font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+  /* --- CANVAS AREA --- */
+  #canvas-wrap {
+    position: relative; border-radius: var(--radius);
+    overflow: hidden; background: #080612;
+    border: 1px solid var(--border); margin-bottom: 14px;
+    touch-action: none; user-select: none;
+    min-height: 300px; display: flex; align-items: center; justify-content: center;
+  }
+  #canvas-wrap.has-image { min-height: unset; }
+  #main-canvas { width: 100%; display: block; cursor: crosshair; }
+  .canvas-placeholder {
+    display: flex; flex-direction: column; align-items: center;
+    gap: 10px; color: var(--muted); padding: 40px 20px; text-align: center;
+  }
+  .canvas-placeholder .ph-icon { font-size: 48px; opacity: .5; }
+  .canvas-placeholder p { font-size: 14px; }
+  .canvas-placeholder small { font-size: 12px; opacity: .6; }
+
+  /* --- CONTROLS ROW --- */
+  .controls-row {
+    display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px;
+  }
+  .controls-row .btn { flex: 1; min-width: 120px; }
+
+  /* --- PLACEMENT TOOLS --- */
+  #placement-tools { display: none; }
+  #placement-tools.visible { display: block; }
+
+  .slider-group { margin-bottom: 12px; }
+  .slider-label { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+  .slider-label span { font-size: 12px; color: var(--muted); font-weight: 600; }
+  .slider-label .val { font-family: 'Space Mono', monospace; color: var(--text); }
+  input[type=range] { width: 100%; accent-color: var(--accent); height: 4px; }
+
+  /* --- EXPORT --- */
+  .export-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  /* --- STATUS CHIP --- */
+  .chip {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 4px 10px; border-radius: 99px; font-size: 11px; font-weight: 700;
+    font-family: 'Space Mono', monospace;
+  }
+  .chip-pink { background: rgba(255,110,180,.15); color: var(--accent); }
+  .chip-purple { background: rgba(167,139,250,.15); color: var(--accent2); }
+  .chip-green { background: rgba(52,211,153,.15); color: var(--accent3); }
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; display: inline-block; }
+
+  /* --- HINT BAR --- */
+  .hint-bar {
+    background: rgba(167,139,250,.08); border: 1px solid rgba(167,139,250,.2);
+    border-radius: var(--radius-sm); padding: 10px 14px; margin-bottom: 14px;
+    font-size: 12px; color: var(--accent2); display: flex; align-items: center; gap: 8px;
+  }
+
+  /* --- TOAST --- */
+  #toast {
+    position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(80px);
+    background: var(--card); border: 1px solid var(--border);
+    padding: 12px 22px; border-radius: 99px; font-size: 13px; font-weight: 700;
+    box-shadow: 0 8px 32px rgba(0,0,0,.5); z-index: 9999;
+    transition: transform .3s cubic-bezier(.34,1.56,.64,1);
+    white-space: nowrap;
+  }
+  #toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* --- DIVIDER --- */
+  .divider { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  @media (max-width: 400px) {
+    .mode-grid { grid-template-columns: 1fr; }
+    .plushie-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+<div id="app">
+
+<header>
+  <div class="logo">
+    <img src="pet.gif" alt="PlushieGO Logo" style="width: 40px; height: 40px; display: block;">
+  </div>
+  <div>
+    <h1>PlushieGO</h1>
+    <p>Bring your plushie anywhere</p>
+  </div>
+</header>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('register')" id="tab-register">
+      <span class="tab-icon"><span class="tab-icon"><img src="register.png" alt="PlushieGO Logo" style="width: 40px; height: 40px; display: block;"></span>Register
+    </button>
+    <button class="tab-btn" onclick="switchTab('camera')" id="tab-camera">
+      <span class="tab-icon"><img src="camera.png" alt="PlushieGO Logo" style="width: 40px; height: 40px; display: block;"></span>Camera
+    </button>
+    <button class="tab-btn" onclick="switchTab('library')" id="tab-library">
+      <span class="tab-icon"><span class="tab-icon"><img src="library.png" alt="PlushieGO Logo" style="width: 40px; height: 40px; display: block;"></span>Library
+    </button>
+  </div>
+
+  <!-- ==================== REGISTER PANEL ==================== -->
+  <div class="panel active" id="panel-register">
+
+    <div class="card">
+      <div class="card-title">Plushie Photo</div>
+      <a href="https://www.photoroom.com/tools/background-remover" 
+   target="_blank" 
+   class="btn btn-secondary" 
+   style="display: block; text-align: center; margin-top: 10px; text-decoration: none;">
+    Remove Background Externally
+</a>
+      <div class="upload-zone" id="reg-upload-zone">
+        <input type="file" accept="image/*" id="reg-file-input"/>
+        <div id="reg-upload-placeholder">
+          <div class="upload-icon"></div>
+        
+          <p>Tap to upload plushie photo</p>
+          <small>make sure they cute</small>
+        </div>
+        <img id="reg-preview" style="display:none"/>
+      </div>
+
+      <div id="bg-removal-section" style="display:none">
+        <hr class="divider"/>
+        <div class="card-title"> Background Removal</div>
+        <label>Tolerance (lower = remove less)</label>
+        <div class="threshold-row">
+          <input type="range" id="tolerance-slider" min="5" max="120" value="30" oninput="updateBGRemoval()"/>
+          <span id="tolerance-val">30</span>
+        </div>
+        <div id="bg-preview-wrap">
+          <canvas id="bg-preview" style="display:none"></canvas>
+        </div>
+        <div style="display:flex; gap:8px; margin-top:10px">
+          <button class="btn btn-secondary btn-sm" style="flex:1" onclick="resetBGRemoval()">↩ Reset</button>
+          <button class="btn btn-success btn-sm" style="flex:1" onclick="acceptBGRemoval()">✓ Use this</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Plushie Info</div>
+      <div class="field">
+        <label>Name</label>
+        <input type="text" id="plushie-name" placeholder="e.g. saaya, syaa, sayang…"/>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>Height (cm)</label>
+          <input type="number" id="plushie-height" placeholder="25" min="1" max="200"/>
+        </div>
+        <div class="field">
+          <label>Width (cm)</label>
+          <input type="number" id="plushie-width" placeholder="optional" min="1" max="200"/>
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="savePlushie()"><img src="wobble.gif" alt="PlushieGO Logo" style="width: 40px; height: 40px; display: block;"> Save Plushie</button>
+    </div>
+
+  </div>
+
+  <!-- ==================== CAMERA PANEL ==================== -->
+  <div class="panel" id="panel-camera">
+
+    <!-- Mode selection -->
+    <div class="card">
+      <div class="card-title">🎮 Mode</div>
+      <div class="mode-grid">
+        <div class="mode-card active" id="mode-closeup" onclick="selectMode('closeup')">
+                    <div class="mode-icon">
+  <img src="close.png" alt="Mode Icon" style="width: 50px; height: 50px;">
+</div>
+          <div class="mode-name">Close-Up</div>
+          <div class="mode-desc">Selfies & peeks</div>
+        </div>
+        <div class="mode-card" id="mode-table" onclick="selectMode('table')">
+          <div class="mode-icon">
+  <img src="sit.png" alt="Mode Icon" style="width: 50px; height: 50px;">
+</div>
+          <div class="mode-name">Sit Mode</div>
+          <div class="mode-desc">Perspective placement</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Plushie picker -->
+    <div class="card">
+      <div class="card-title"> Choose Plushie</div>
+      <div id="cam-plushie-grid" class="plushie-grid">
+        <div class="empty-state" style="grid-column:1/-1">
+          <div class="empty-icon"></div>
+          <p>No plushies yet — register one first!</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Photo upload -->
+    <div class="card">
+      <div class="card-title">🖼 Background Photo</div>
+      <div class="upload-zone" id="cam-upload-zone">
+        <input type="file" accept="image/*" id="cam-file-input"/>
+        <div id="cam-upload-placeholder">
+          <div class="upload-icon">📷</div>
+          <p>Upload a photo</p>
+          <small>Or take one with your camera</small>
+        </div>
+        <img id="cam-preview" style="display:none"/>
+      </div>
+    </div>
+
+    <!-- Canvas -->
+    <div id="canvas-wrap">
+      <div class="canvas-placeholder" id="canvas-placeholder">
+        <div class="ph-icon"></div>
+        <p>Select a plushie and upload a photo</p>
+        <small>Then tap to place your plushie!</small>
+      </div>
+      <canvas id="main-canvas" style="display:none"></canvas>
+    </div>
+
+    <!-- Hint -->
+    <div class="hint-bar" id="hint-bar" style="display:none">
+      <span>💡</span><span id="hint-text">Tap on the canvas to place your plushie</span>
+    </div>
+
+    <!-- Placement tools -->
+    <div id="placement-tools">
+      
+      <div class="card">
+        <div class="card-title">🎛 Adjust Plushie</div>
+        <div class="slider-group">
+  <div class="slider-label">
+    <span>Brightness</span><span class="val" id="bright-val">100%</span>
+  </div>
+  <!-- Range 0 (black) to 200 (white), default is 100% (original) -->
+  <input type="range" id="bright-slider" min="0" max="200" value="100" oninput="onBrightSlider()"/>
+</div>
+        <!-- Inside #placement-tools -->
+<div class="slider-group">
+  <div class="slider-label">
+    <span>Background Blur</span><span class="val" id="blur-val">0px</span>
+  </div>
+  <input type="range" id="blur-slider" min="0" max="10" value="0" oninput="onBlurSlider()"/>
+</div>
+
+        <div class="slider-group">
+          <div class="slider-label">
+            <span>Scale</span><span class="val" id="scale-val">1.0×</span>
+          </div>
+          <input type="range" id="scale-slider" min="10" max="300" value="100" oninput="onScaleSlider()"/>
+        </div>
+
+        <div class="slider-group">
+          <div class="slider-label">
+            <span>Rotate</span><span class="val" id="rotate-val">0°</span>
+          </div>
+          <input type="range" id="rotate-slider" min="-180" max="180" value="0" oninput="onRotateSlider()"/>
+        </div>
+
+        <div class="slider-group">
+          <div class="slider-label">
+            <span>Shadow opacity</span><span class="val" id="shadow-val">20%</span>
+          </div>
+          <input type="range" id="shadow-slider" min="0" max="60" value="20" oninput="onShadowSlider()"/>
+        </div>
+
+        <button class="btn btn-secondary btn-sm" style="width:100%;margin-top:4px" onclick="resetPlacement()">↩ Reset Position</button>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="tab-icon"><img src="nyan-cat.gif" alt="PlushieGO Logo" style="width: 40px; height: 40px; display: block;"> Export</div>
+        <div class="export-row">
+          <button class="btn btn-primary" onclick="exportImage('png')">⬇ PNG</button>
+          <button class="btn btn-secondary" onclick="exportImage('jpeg')">⬇ JPG</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ==================== LIBRARY PANEL ==================== -->
+  <div class="panel" id="panel-library">
+    <div class="card">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px">
+        <div class="card-title" style="margin-bottom:0">🗂 My Plushies</div>
+        <span id="lib-count" class="chip chip-purple"><span class="dot"></span>0 saved</span>
+      </div>
+      <div id="library-grid" class="plushie-grid"></div>
+    </div>
+  </div>
+
+</div><!-- /#app -->
+
+<div id="toast">🎉 Saved!</div>
+
+<script>
+// ============================================================
+//  LocalDatabase
+// ============================================================
+const DB = {
+  getAll() {
+    try { return JSON.parse(localStorage.getItem('plushies') || '[]'); } catch { return []; }
+  },
+  save(list) {
+    localStorage.setItem('plushies', JSON.stringify(list));
+  },
+  add(entry) {
+    const list = this.getAll();
+    list.push(entry);
+    this.save(list);
+  },
+  remove(id) {
+    this.save(this.getAll().filter(p => p.id !== id));
+  }
+};
+
+// ============================================================
+//  State
+// ============================================================
+const state = {
+  mode: 'closeup',
+  regRawDataURL: null,
+  regProcessedDataURL: null,
+  selectedPlushieId: null,
+  bgImage: null,
+  plushie: {
+    image: null, // HTMLImageElement
+    x: 0, y: 0,
+    scale: 1,
+    rotate: 0,
+    naturalW: 0, naturalH: 0,
+    data: null // DB record
+  },
+  drag: { active: false, startX: 0, startY: 0, origX: 0, origY: 0 },
+shadowOpacity: 0.20,
+  blurIntensity: 0, 
+  brightness: 100,
+  placed: false
+};
+
+// ============================================================
+//  Tab Navigation
+// ============================================================
+function switchTab(id) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  document.getElementById('tab-' + id).classList.add('active');
+  if (id === 'camera') refreshCamPlushieGrid();
+  if (id === 'library') refreshLibrary();
+}
+
+// ============================================================
+//  Register Panel
+// ============================================================
+const regFileInput = document.getElementById('reg-file-input');
+const regPreview = document.getElementById('reg-preview');
+const regPlaceholder = document.getElementById('reg-upload-placeholder');
+const regZone = document.getElementById('reg-upload-zone');
+const bgSection = document.getElementById('bg-removal-section');
+const bgCanvas = document.getElementById('bg-preview');
+const bgCtx = bgCanvas.getContext('2d');
+let rawImageData = null; // original ImageData for BG removal
+
+regFileInput.addEventListener('change', e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const url = URL.createObjectURL(file);
+  const img = new Image();
+  img.onload = () => {
+    state.regRawDataURL = url;
+    state.regProcessedDataURL = url;
+    regPreview.src = url;
+    regPreview.style.display = 'block';
+    regPlaceholder.style.display = 'none';
+    regZone.classList.add('has-image');
+    bgSection.style.display = 'block';
+    // Render to hidden canvas to grab pixel data
+    const tmp = document.createElement('canvas');
+    tmp.width = img.width; tmp.height = img.height;
+    const tc = tmp.getContext('2d');
+    tc.drawImage(img, 0, 0);
+    rawImageData = tc.getImageData(0, 0, img.width, img.height);
+    // Show BG preview
+    bgCanvas.width = img.width; bgCanvas.height = img.height;
+    bgCanvas.style.display = 'block';
+    applyBGRemoval(30);
+  };
+  img.src = url;
+});
+
+function floodFillAlpha(imgData, x, y, tolerance) {
+  const { data, width, height } = imgData;
+  const stack = [[x, y]];
+  const visited = new Uint8Array(width * height);
+  const idx0 = (y * width + x) * 4;
+  const r0 = data[idx0], g0 = data[idx0+1], b0 = data[idx0+2];
+
+  function colorDist(i) {
+    return Math.abs(data[i]-r0) + Math.abs(data[i+1]-g0) + Math.abs(data[i+2]-b0);
+  }
+
+  while (stack.length) {
+    const [cx, cy] = stack.pop();
+    if (cx < 0 || cy < 0 || cx >= width || cy >= height) continue;
+    const ci = cy * width + cx;
+    if (visited[ci]) continue;
+    visited[ci] = 1;
+    const pi = ci * 4;
+    if (colorDist(pi) > tolerance) continue;
+    data[pi+3] = 0; // make transparent
+    stack.push([cx+1,cy],[cx-1,cy],[cx,cy+1],[cx,cy-1]);
+  }
+  return imgData;
+}
+
+function applyBGRemoval(tolerance) {
+  if (!rawImageData) return;
+  const copy = new ImageData(new Uint8ClampedArray(rawImageData.data), rawImageData.width, rawImageData.height);
+  const w = copy.width, h = copy.height;
+  // flood fill from 4 corners
+  floodFillAlpha(copy, 0, 0, tolerance);
+  floodFillAlpha(copy, w-1, 0, tolerance);
+  floodFillAlpha(copy, 0, h-1, tolerance);
+  floodFillAlpha(copy, w-1, h-1, tolerance);
+  bgCtx.clearRect(0, 0, w, h);
+  bgCtx.putImageData(copy, 0, 0);
+  // Store result as data URL
+  state.regProcessedDataURL = bgCanvas.toDataURL('image/png');
+}
+
+function updateBGRemoval() {
+  const v = parseInt(document.getElementById('tolerance-slider').value);
+  document.getElementById('tolerance-val').textContent = v;
+  applyBGRemoval(v);
+}
+
+function resetBGRemoval() {
+  state.regProcessedDataURL = state.regRawDataURL;
+  if (!rawImageData) return;
+  bgCtx.putImageData(rawImageData, 0, 0);
+}
+
+function acceptBGRemoval() {
+  showToast('✅ Background removed');
+}
+
+function savePlushie() {
+  const name = document.getElementById('plushie-name').value.trim();
+  const height = parseFloat(document.getElementById('plushie-height').value);
+  const width = parseFloat(document.getElementById('plushie-width').value) || null;
+  if (!state.regProcessedDataURL) { showToast('⚠️ Upload a photo first'); return; }
+  if (!name) { showToast('⚠️ Enter a name'); return; }
+  if (!height || isNaN(height)) { showToast('⚠️ Enter height'); return; }
+  const entry = {
+    id: Date.now().toString(),
+    name, height, width,
+    image: state.regProcessedDataURL,
+    createdAt: new Date().toISOString()
+  };
+  DB.add(entry);
+  showToast('🧸 ' + name + ' saved!');
+  // Reset form
+  document.getElementById('plushie-name').value = '';
+  document.getElementById('plushie-height').value = '';
+  document.getElementById('plushie-width').value = '';
+  regPreview.style.display = 'none';
+  regPlaceholder.style.display = 'block';
+  regZone.classList.remove('has-image');
+  bgSection.style.display = 'none';
+  state.regRawDataURL = null;
+  state.regProcessedDataURL = null;
+  rawImageData = null;
+}
+
+// ============================================================
+//  Mode Selection
+// ============================================================
+function selectMode(mode) {
+  state.mode = mode;
+  document.getElementById('mode-closeup').classList.toggle('active', mode === 'closeup');
+  document.getElementById('mode-table').classList.toggle('active', mode === 'table');
+  updateHint();
+  redraw();
+}
+
+// ============================================================
+//  Camera Panel — Plushie Grid
+// ============================================================
+function refreshCamPlushieGrid() {
+  const grid = document.getElementById('cam-plushie-grid');
+  const list = DB.getAll();
+  if (!list.length) {
+    grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">😔</div><p>Register a plushie first!</p></div>';
+    return;
+  }
+  grid.innerHTML = list.map(p => `
+    <div class="plushie-card ${state.selectedPlushieId === p.id ? 'selected' : ''}" onclick="selectPlushie('${p.id}')">
+      <img src="${p.image}" loading="lazy"/>
+      <div class="plushie-card-info">
+        <div class="plushie-card-name">${escHtml(p.name)}</div>
+        <div class="plushie-card-meta">${p.height}cm</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function selectPlushie(id) {
+  state.selectedPlushieId = id;
+  const record = DB.getAll().find(p => p.id === id);
+  if (!record) return;
+  const img = new Image();
+  img.onload = () => {
+    state.plushie.image = img;
+    state.plushie.naturalW = img.width;
+    state.plushie.naturalH = img.height;
+    state.plushie.data = record;
+    refreshCamPlushieGrid();
+    if (state.bgImage) placePlushieCenter();
+    updateHint();
+    tryShowCanvas();
+  };
+  img.src = record.image;
+}
+
+// ============================================================
+//  Camera Panel — Photo Upload
+// ============================================================
+const camFileInput = document.getElementById('cam-file-input');
+const camPreview = document.getElementById('cam-preview');
+const camZone = document.getElementById('cam-upload-zone');
+
+camFileInput.addEventListener('change', e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const url = URL.createObjectURL(file);
+  const img = new Image();
+  img.onload = () => {
+    state.bgImage = img;
+    camPreview.src = url;
+    camPreview.style.display = 'block';
+    document.getElementById('cam-upload-placeholder').style.display = 'none';
+    camZone.classList.add('has-image');
+    if (state.plushie.image) placePlushieCenter();
+    updateHint();
+    tryShowCanvas();
+  };
+  img.src = url;
+});
+
+function tryShowCanvas() {
+  const hasAll = state.bgImage && state.plushie.image;
+  const placeholder = document.getElementById('canvas-placeholder');
+  const canvas = document.getElementById('main-canvas');
+  const hint = document.getElementById('hint-bar');
+  if (hasAll) {
+    placeholder.style.display = 'none';
+    canvas.style.display = 'block';
+    document.getElementById('canvas-wrap').classList.add('has-image');
+    hint.style.display = 'flex';
+    redraw();
+  } else {
+    placeholder.style.display = 'flex';
+    canvas.style.display = 'none';
+  }
+}
+
+// ============================================================
+//  Canvas
+// ============================================================
+const canvas = document.getElementById('main-canvas');
+const ctx = canvas.getContext('2d');
+const DISPLAY_WIDTH = 480; // logical width we render at
+
+function placePlushieCenter() {
+  if (!state.bgImage || !state.plushie.image) return;
+  const ratio = state.bgImage.height / state.bgImage.width;
+  const ch = DISPLAY_WIDTH * ratio;
+  state.plushie.x = DISPLAY_WIDTH / 2;
+  state.plushie.y = ch * 0.7;
+  state.plushie.rotate = 0;
+  const baseScale = (DISPLAY_WIDTH * 0.25) / state.plushie.naturalW;
+  state.plushie.scale = applyPerspectiveScale(baseScale, state.plushie.y, ch);
+  syncSliders();
+  state.placed = true;
+  showPlacementTools(true);
+  redraw();
+}
+
+function applyPerspectiveScale(baseScale, yPos, imgHeight) {
+  if (state.mode === 'table') {
+    const t = Math.max(0.4, Math.min(1.8, (yPos / imgHeight) * 1.8));
+    return baseScale * t;
+  }
+  return baseScale;
+}
+
+function redraw() {
+  if (!state.bgImage) return;
+  const ratio = state.bgImage.height / state.bgImage.width;
+  const ch = Math.round(DISPLAY_WIDTH * ratio);
+  canvas.width = DISPLAY_WIDTH;
+  canvas.height = ch;
+
+  // Draw Background with dynamic blur
+  ctx.save();
+  ctx.filter = `blur(${state.blurIntensity}px)`;
+  ctx.drawImage(state.bgImage, 0, 0, DISPLAY_WIDTH, ch);
+  ctx.restore();
+
+  // Draw Plushie with slight edge anti-aliasing
+  if (state.placed && state.plushie.image) {
+    drawShadow(ctx, state.plushie, state.shadowOpacity, ch);
+    
+    ctx.save();
+    // Subtle edge softening for better blending
+    ctx.filter = 'blur(0.2px)'; 
+    drawPlushie(ctx, state.plushie);
+    ctx.restore();
+  }
+}
+
+function drawPlushie(ctx, p) {
+  const dw = p.naturalW * p.scale;
+  const dh = p.naturalH * p.scale;
+  ctx.save();
+  ctx.translate(p.x, p.y);
+  ctx.rotate(p.rotate * Math.PI / 180);
+
+  ctx.filter = `brightness(${state.brightness}%)`;
+
+  ctx.drawImage(p.image, -dw/2, -dh/2, dw, dh);
+  ctx.restore();
+}
+
+function drawShadow(ctx, p, opacity, canvasH) {
+  const dw = p.naturalW * p.scale;
+  const dh = p.naturalH * p.scale;
+  const sw = dw * 0.75;
+  const sh = dh * 0.18;
+  const sy = p.y + dh/2 * 0.85;
+
+  ctx.save();
+  ctx.translate(p.x, sy);
+  ctx.rotate(p.rotate * Math.PI / 180);
+
+  const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, sw * 0.6);
+  grad.addColorStop(0, `rgba(0,0,0,${opacity})`);
+  grad.addColorStop(1, 'rgba(0,0,0,0)');
+
+  ctx.scale(1, sh / (sw * 0.6));
+  ctx.beginPath();
+  ctx.ellipse(0, 0, sw * 0.6, sw * 0.6, 0, 0, Math.PI * 2);
+  ctx.fillStyle = grad;
+  ctx.filter = 'blur(6px)';
+  ctx.fill();
+  ctx.restore();
+}
+
+// ============================================================
+//  Canvas Interaction
+// ============================================================
+function canvasCoords(e) {
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = canvas.width / rect.width;
+  const scaleY = canvas.height / rect.height;
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+  return {
+    x: (clientX - rect.left) * scaleX,
+    y: (clientY - rect.top) * scaleY
+  };
+}
+
+function isOverPlushie(x, y) {
+  if (!state.placed) return false;
+  const p = state.plushie;
+  const hw = (p.naturalW * p.scale) / 2;
+  const hh = (p.naturalH * p.scale) / 2;
+  const dx = x - p.x, dy = y - p.y;
+  // Rotate the point into plushie-local space
+  const rad = -p.rotate * Math.PI / 180;
+  const lx = dx * Math.cos(rad) - dy * Math.sin(rad);
+  const ly = dx * Math.sin(rad) + dy * Math.cos(rad);
+  return Math.abs(lx) < hw && Math.abs(ly) < hh;
+}
+
+canvas.addEventListener('mousedown', startDrag);
+canvas.addEventListener('touchstart', startDrag, { passive: false });
+canvas.addEventListener('mousemove', moveDrag);
+canvas.addEventListener('touchmove', moveDrag, { passive: false });
+canvas.addEventListener('mouseup', endDrag);
+canvas.addEventListener('touchend', endDrag);
+
+function startDrag(e) {
+  e.preventDefault();
+  const { x, y } = canvasCoords(e);
+  if (isOverPlushie(x, y)) {
+    state.drag = { active: true, startX: x, startY: y, origX: state.plushie.x, origY: state.plushie.y };
+  } else if (state.bgImage && state.plushie.image) {
+    // Place plushie at tap location
+    const ratio = state.bgImage.height / state.bgImage.width;
+    const ch = DISPLAY_WIDTH * ratio;
+    const baseScale = (DISPLAY_WIDTH * 0.25) / state.plushie.naturalW;
+    state.plushie.x = x;
+    state.plushie.y = y;
+    state.plushie.scale = applyPerspectiveScale(baseScale, y, ch);
+    state.placed = true;
+    showPlacementTools(true);
+    syncSliders();
+    redraw();
+    updateHint();
+  }
+}
+
+function moveDrag(e) {
+  e.preventDefault();
+  if (!state.drag.active) return;
+  const { x, y } = canvasCoords(e);
+  const ratio = state.bgImage.height / state.bgImage.width;
+  const ch = DISPLAY_WIDTH * ratio;
+  state.plushie.x = state.drag.origX + (x - state.drag.startX);
+  state.plushie.y = state.drag.origY + (y - state.drag.startY);
+  if (state.mode === 'table') {
+    const baseScale = (DISPLAY_WIDTH * 0.25) / state.plushie.naturalW;
+    state.plushie.scale = applyPerspectiveScale(baseScale, state.plushie.y, ch);
+    syncSliders();
+  }
+  redraw();
+}
+
+function endDrag(e) {
+  state.drag.active = false;
+}
+
+// ============================================================
+//  Sliders
+// ============================================================
+
+function onBlurSlider() {
+  const v = parseInt(document.getElementById('blur-slider').value);
+  state.blurIntensity = v;
+  document.getElementById('blur-val').textContent = v + 'px';
+  redraw();
+}
+
+function onBrightSlider() {
+  const v = parseInt(document.getElementById('bright-slider').value);
+  state.brightness = v;
+  document.getElementById('bright-val').textContent = v + '%';
+  redraw();
+}
+
+function syncSliders() {
+  const sv = Math.round(state.plushie.scale * 100);
+  document.getElementById('scale-slider').value = sv;
+  document.getElementById('scale-val').textContent = (state.plushie.scale).toFixed(2) + '×';
+  document.getElementById('rotate-slider').value = Math.round(state.plushie.rotate);
+  document.getElementById('rotate-val').textContent = Math.round(state.plushie.rotate) + '°';
+}
+
+function onScaleSlider() {
+  const v = parseInt(document.getElementById('scale-slider').value);
+  state.plushie.scale = v / 100;
+  document.getElementById('scale-val').textContent = state.plushie.scale.toFixed(2) + '×';
+  redraw();
+}
+
+function onRotateSlider() {
+  const v = parseInt(document.getElementById('rotate-slider').value);
+  state.plushie.rotate = v;
+  document.getElementById('rotate-val').textContent = v + '°';
+  redraw();
+}
+
+function onShadowSlider() {
+  const v = parseInt(document.getElementById('shadow-slider').value);
+  state.shadowOpacity = v / 100;
+  document.getElementById('shadow-val').textContent = v + '%';
+  redraw();
+}
+
+function resetPlacement() {
+  placePlushieCenter();
+  document.getElementById('rotate-slider').value = 0;
+  document.getElementById('rotate-val').textContent = '0°';
+  document.getElementById('shadow-slider').value = 20;
+  document.getElementById('shadow-val').textContent = '20%';
+  state.shadowOpacity = 0.20;
+  document.getElementById('blur-slider').value = 0;
+  document.getElementById('blur-val').textContent = '0px';
+  state.blurIntensity = 0;
+  rdocument.getElementById('bright-slider').value = 100;
+  document.getElementById('bright-val').textContent = '100%';
+  state.brightness = 100;
+  redraw();
+
+}
+
+// ============================================================
+//  Placement Tools visibility
+// ============================================================
+function showPlacementTools(show) {
+  document.getElementById('placement-tools').classList.toggle('visible', show);
+}
+
+// ============================================================
+//  Hint
+// ============================================================
+function updateHint() {
+  const hint = document.getElementById('hint-text');
+  if (!state.bgImage || !state.plushie.image) {
+    hint.textContent = 'Select a plushie and upload a photo first';
+    return;
+  }
+  if (!state.placed) {
+    hint.textContent = state.mode === 'table'
+      ? 'Tap on the table surface to place your plushie'
+      : 'Tap anywhere to place your plushie';
+    return;
+  }
+  hint.textContent = state.mode === 'table'
+    ? 'Drag to reposition · Size auto-scales with perspective'
+    : 'Drag to reposition · Use sliders to fine-tune';
+}
+
+// ============================================================
+//  Export
+// ============================================================
+function exportImage(format) {
+  if (!state.placed) { showToast('⚠️ Place a plushie first'); return; }
+  redraw();
+  const mime = format === 'png' ? 'image/png' : 'image/jpeg';
+  const quality = format === 'jpeg' ? 0.92 : undefined;
+  const data = canvas.toDataURL(mime, quality);
+  const a = document.createElement('a');
+  a.href = data;
+  a.download = `plushiego-${Date.now()}.${format}`;
+  a.click();
+  showToast('📥 Downloaded as ' + format.toUpperCase());
+}
+
+// ============================================================
+//  Library Panel
+// ============================================================
+function refreshLibrary() {
+  const grid = document.getElementById('library-grid');
+  const list = DB.getAll();
+  document.getElementById('lib-count').innerHTML = `<span class="dot"></span>${list.length} saved`;
+  if (!list.length) {
+    grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">🧸</div><p>No plushies yet</p></div>';
+    return;
+  }
+  grid.innerHTML = list.map(p => `
+    <div class="plushie-card">
+      <img src="${p.image}" loading="lazy"/>
+      <button class="del-btn" onclick="deletePlushie('${p.id}',event)" title="Delete">✕</button>
+      <div class="plushie-card-info">
+        <div class="plushie-card-name">${escHtml(p.name)}</div>
+        <div class="plushie-card-meta">${p.height}cm · ${new Date(p.createdAt).toLocaleDateString()}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function deletePlushie(id, e) {
+  e.stopPropagation();
+  DB.remove(id);
+  refreshLibrary();
+  if (state.selectedPlushieId === id) {
+    state.selectedPlushieId = null;
+    state.plushie.image = null;
+    state.placed = false;
+    showPlacementTools(false);
+    redraw();
+  }
+  showToast('🗑 Deleted');
+}
+
+// ============================================================
+//  Toast
+// ============================================================
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+// ============================================================
+//  Utilities
+// ============================================================
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ============================================================
+//  Init
+// ============================================================
+refreshCamPlushieGrid();
+</script>
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js');
+  }
+</script>
+</body>
+</html>
